@@ -203,6 +203,12 @@ end
 fprintf('========================================================================================================================\n\n');
 
 %% 8. Publication-Quality Visualizations
+projRoot = fileparts(fileparts(mfilename('fullpath')));
+if isempty(projRoot), projRoot = pwd; end
+figDir = fullfile(projRoot, 'docs', 'figures');
+if ~exist(figDir, 'dir'), mkdir(figDir); end
+resDir = fullfile(projRoot, 'results');
+if ~exist(resDir, 'dir'), mkdir(resDir); end
 
 % Color Palette
 c_ref  = [0.15 0.15 0.15];   % Dark gray
@@ -224,7 +230,7 @@ ylabel('DC-Bus Voltage (V)', 'FontSize', 11);
 legend('Location', 'southeast', 'FontSize', 10);
 xline(8.0, 'k:', 'LineWidth', 1.2); text(8.2, 275, 'Solar Cloud Cover (-4.0 A)', 'FontSize', 10, 'FontWeight', 'bold');
 xline(16.0, 'r:', 'LineWidth', 1.2); text(16.2, 275, 'Heavy Load Switching (+6.5 A)', 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'r');
-saveas(f1, 'Figure1_Microgrid_Voltage_Regulation.png');
+saveas(f1, fullfile(figDir, 'Figure1_Microgrid_Voltage_Regulation.png'));
 close(f1);
 
 % --- Figure 2: Closed-Loop Tracking Error Trajectory ---
@@ -241,7 +247,7 @@ title('Tracking Error Trajectory: e(t) = 300 V - V_{sensed}(t)', 'FontSize', 13,
 xlabel('Time (seconds)', 'FontSize', 11);
 ylabel('Tracking Error e(t) (V)', 'FontSize', 11);
 legend('Location', 'northeast', 'FontSize', 10);
-saveas(f2, 'Figure2_Microgrid_Tracking_Error.png');
+saveas(f2, fullfile(figDir, 'Figure2_Microgrid_Tracking_Error.png'));
 close(f2);
 
 % --- Figure 3: Battery Storage Bidirectional Current Commands ---
@@ -258,7 +264,7 @@ title('Bidirectional BESS Converter Current: i_{batt}(t) = u(t)', 'FontSize', 13
 xlabel('Time (seconds)', 'FontSize', 11);
 ylabel('Battery Inductor Current (A)', 'FontSize', 11);
 legend('Location', 'southeast', 'FontSize', 10);
-saveas(f3, 'Figure3_Battery_Bidirectional_Current.png');
+saveas(f3, fullfile(figDir, 'Figure3_Battery_Bidirectional_Current.png'));
 close(f3);
 
 % --- Figure 4: Microgrid Current & Power Balance ---
@@ -282,7 +288,7 @@ grid on; title('BESS Response Balancing Current i_{batt}(t) [Charge < 0 | Discha
 ylabel('Current (A)'); xlabel('Time (seconds)'); xlim([0 25]); ylim([-11 11]);
 legend('Location', 'southeast');
 
-saveas(f4, 'Figure4_Microgrid_Power_Current_Balance.png');
+saveas(f4, fullfile(figDir, 'Figure4_Microgrid_Power_Current_Balance.png'));
 close(f4);
 
 % --- Figure 5: Highlighted Disturbance Events Subplots ---
@@ -310,7 +316,7 @@ title('Zoomed-in Dynamic Response: Heavy Load Switching Event (t = 16.0 s)');
 xlabel('Time (s)'); ylabel('DC Bus Voltage (V)');
 legend('Location', 'southeast');
 
-saveas(f5, 'Figure5_Transient_Events_Detailed.png');
+saveas(f5, fullfile(figDir, 'Figure5_Transient_Events_Detailed.png'));
 close(f5);
 
 %% 9. Save All Microgrid Benchmark Data
@@ -329,6 +335,6 @@ microgridData.i_batt_TD3 = i_batt_TD3;
 microgridData.i_batt_LSTM = i_batt_LSTM;
 microgridData.metrics = metrics;
 
-save('microgrid_benchmark_results.mat', 'microgridData');
+save(fullfile(resDir, 'microgrid_benchmark_results.mat'), 'microgridData');
 fprintf('All microgrid figures and benchmark data saved successfully.\n');
 fprintf('\n>>> STEP 5 MICROGRID BENCHMARK COMPLETED SUCCESSFULLY! <<<\n\n');

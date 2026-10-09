@@ -77,20 +77,17 @@ Evaluated over a comprehensive 25-second mission profile including cold-start ca
 
 ## 5. Quick-Start Execution Guide
 
-In MATLAB (R2025b or later):
+In MATLAB (R2025b or later), execute from the project directory:
 
 ```matlab
-% 1. Navigate to project directory
-cd('c:\Users\Santhosh\Documents\antigravity\friendly-carson');
+% 1. One-click setup: opens Simulink model canvas, launches live 3-channel scope, and runs simulation
+open_and_simulate;
 
-% 2. Run master verification and quality assurance audit
-run('verify_complete_project.m');
-
-% 3. Run simulation and generate all benchmark plots
-run('run_solar_battery_microgrid_benchmark.m');
-
-% 4. Open and inspect the Simulink model
+% 2. Or open and inspect the Simulink model interactively
 open_system('DC_Microgrid_Solar_Battery_Simulink');
+
+% 3. Run master verification and quality assurance audit (8/8 test suites pass)
+verify_project;
 ```
 
 ---

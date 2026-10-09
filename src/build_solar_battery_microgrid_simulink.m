@@ -147,8 +147,13 @@ add_block('simulink/Sinks/To Workspace', [mdl '/Log_IPV'], ...
     'Position', [840, 20, 900, 45], 'VariableName', 'ipv_logged', 'SaveFormat', 'Array');
 add_block('simulink/Sinks/To Workspace', [mdl '/Log_ILoad'], ...
     'Position', [840, 220, 900, 245], 'VariableName', 'iload_logged', 'SaveFormat', 'Array');
+add_block('simulink/Signal Routing/Mux', [mdl '/Mux_Scope_Vdc'], ...
+    'Position', [1140, 95, 1145, 135], 'Inputs', '2');
 add_block('simulink/Sinks/Scope', [mdl '/Scope_Microgrid'], ...
-    'Position', [1170, 110, 1200, 140]);
+    'Position', [1180, 100, 1220, 160], ...
+    'NumInputPorts', '3', ...
+    'LayoutDimensionsString', '[3 1]', ...
+    'OpenAtSimulationStart', 'on');
 
 %% 5. Wire Connections
 % Reference
@@ -157,7 +162,16 @@ add_line(mdl, 'Vref_300V/1', 'Sum_Error/1');
 % Error feedback
 add_line(mdl, 'Sum_Sensor/1', 'Sum_Error/2', 'autorouting', 'on');
 add_line(mdl, 'Sum_Sensor/1', 'Log_Vdc/1');
-add_line(mdl, 'Sum_Sensor/1', 'Scope_Microgrid/1');
+
+% 3-Channel Scope Connections
+% Channel 1: Bus Voltage (Vref 300V vs Vsensed)
+add_line(mdl, 'Vref_300V/1', 'Mux_Scope_Vdc/1', 'autorouting', 'on');
+add_line(mdl, 'Sum_Sensor/1', 'Mux_Scope_Vdc/2', 'autorouting', 'on');
+add_line(mdl, 'Mux_Scope_Vdc/1', 'Scope_Microgrid/1', 'autorouting', 'on');
+% Channel 2: Tracking Error e(t)
+add_line(mdl, 'Sum_Error/1', 'Scope_Microgrid/2', 'autorouting', 'on');
+% Channel 3: Battery Control Current u(t)
+add_line(mdl, 'BESS_Saturation/1', 'Scope_Microgrid/3', 'autorouting', 'on');
 
 % Error routing
 add_line(mdl, 'Sum_Error/1', 'Log_Error/1');
@@ -210,8 +224,11 @@ add_line(mdl, 'DCbus_Capacitor_Bank/1', 'Sum_Vdc_Total/2');
 add_line(mdl, 'Sum_Vdc_Total/1', 'Sum_Sensor/1');
 add_line(mdl, 'Sensor_Noise/1', 'Sum_Sensor/2');
 
-% Save model
-save_system(mdl);
-fprintf('DC Microgrid Simulink model successfully built and saved to %s.slx!\n', mdl);
+% Save model to models directory
+modelsDir = fullfile(fileparts(mfilename('fullpath')), '..', 'models');
+if ~exist(modelsDir, 'dir'), mkdir(modelsDir); end
+modelPath = fullfile(modelsDir, [mdl '.slx']);
+save_system(mdl, modelPath);
+fprintf('DC Microgrid Simulink model successfully built and saved to %s!\n', modelPath);
 
 fprintf('\n>>> MODEL CREATION COMPLETED SUCCESSFULLY! <<<\n\n');

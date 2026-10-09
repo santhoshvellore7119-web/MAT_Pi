@@ -217,24 +217,23 @@ c_td3  = [0.00 0.45 0.74];   % Blue
 c_lstm = [0.47 0.67 0.19];   % Green
 
 % --- Figure 1: DC Bus Voltage Regulation Performance ---
-f1 = figure('Name', 'Microgrid Voltage Tracking', 'Position', [100 100 1100 550], 'Visible', 'off');
+f1 = figure('Name', 'Figure 1 - Microgrid Voltage Tracking', 'Position', [80 120 950 480], 'Visible', 'on');
 plot(t, V_ref, 'k--', 'LineWidth', 2.0, 'DisplayName', 'Nominal Setpoint V_{ref} (300 V)'); hold on;
 plot(t, V_sensed_PI, 'Color', c_pi, 'LineWidth', 1.5, 'DisplayName', 'Conventional Discrete PI');
 plot(t, V_sensed_TD3, 'Color', c_td3, 'LineWidth', 1.5, 'DisplayName', 'TD3-Tuned RL Agent');
 plot(t, V_sensed_LSTM, 'Color', c_lstm, 'LineWidth', 1.8, 'DisplayName', 'Trained 4-Step Memory LSTM');
 grid on; box on;
 xlim([0 25]); ylim([265 315]);
-title('DC Microgrid Voltage Regulation: 300 V Common Coupling Bus', 'FontSize', 13, 'FontWeight', 'bold');
-xlabel('Time (seconds)', 'FontSize', 11);
-ylabel('DC-Bus Voltage (V)', 'FontSize', 11);
-legend('Location', 'southeast', 'FontSize', 10);
-xline(8.0, 'k:', 'LineWidth', 1.2); text(8.2, 275, 'Solar Cloud Cover (-4.0 A)', 'FontSize', 10, 'FontWeight', 'bold');
-xline(16.0, 'r:', 'LineWidth', 1.2); text(16.2, 275, 'Heavy Load Switching (+6.5 A)', 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'r');
+title('Figure 1: DC Microgrid Voltage Regulation (300 V Common Bus)', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Time (seconds)', 'FontSize', 10);
+ylabel('DC-Bus Voltage (V)', 'FontSize', 10);
+legend('Location', 'southeast', 'FontSize', 9);
+xline(8.0, 'k:', 'LineWidth', 1.2); text(8.2, 275, 'Solar Cloud Cover (-4.0 A)', 'FontSize', 9, 'FontWeight', 'bold');
+xline(16.0, 'r:', 'LineWidth', 1.2); text(16.2, 275, 'Heavy Load Switching (+6.5 A)', 'FontSize', 9, 'FontWeight', 'bold', 'Color', 'r');
 saveas(f1, fullfile(figDir, 'Figure1_Microgrid_Voltage_Regulation.png'));
-close(f1);
 
 % --- Figure 2: Closed-Loop Tracking Error Trajectory ---
-f2 = figure('Name', 'Microgrid Tracking Error', 'Position', [100 100 1100 550], 'Visible', 'off');
+f2 = figure('Name', 'Figure 2 - Microgrid Tracking Error', 'Position', [120 100 950 480], 'Visible', 'on');
 plot(t, e_PI, 'Color', c_pi, 'LineWidth', 1.2, 'DisplayName', sprintf('PI (IAE = %.1f V*s)', metrics(1).IAE)); hold on;
 plot(t, e_TD3, 'Color', c_td3, 'LineWidth', 1.2, 'DisplayName', sprintf('TD3-RL (IAE = %.1f V*s)', metrics(2).IAE));
 plot(t, e_LSTM, 'Color', c_lstm, 'LineWidth', 1.5, 'DisplayName', sprintf('Trained LSTM (IAE = %.1f V*s)', metrics(3).IAE));
@@ -243,15 +242,14 @@ yline(6, 'k:', 'IEEE +/-2% Tolerance (+6V)', 'LabelHorizontalAlignment', 'left')
 yline(-6, 'k:', 'IEEE +/-2% Tolerance (-6V)', 'LabelHorizontalAlignment', 'left');
 grid on; box on;
 xlim([0 25]); ylim([-10 35]);
-title('Tracking Error Trajectory: e(t) = 300 V - V_{sensed}(t)', 'FontSize', 13, 'FontWeight', 'bold');
-xlabel('Time (seconds)', 'FontSize', 11);
-ylabel('Tracking Error e(t) (V)', 'FontSize', 11);
-legend('Location', 'northeast', 'FontSize', 10);
+title('Figure 2: Tracking Error Trajectory e(t) = 300 V - V_{sensed}(t)', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Time (seconds)', 'FontSize', 10);
+ylabel('Tracking Error e(t) (V)', 'FontSize', 10);
+legend('Location', 'northeast', 'FontSize', 9);
 saveas(f2, fullfile(figDir, 'Figure2_Microgrid_Tracking_Error.png'));
-close(f2);
 
 % --- Figure 3: Battery Storage Bidirectional Current Commands ---
-f3 = figure('Name', 'Battery Converter Current', 'Position', [100 100 1100 550], 'Visible', 'off');
+f3 = figure('Name', 'Figure 3 - Battery Converter Current', 'Position', [160 80 950 480], 'Visible', 'on');
 plot(t, i_batt_PI, 'Color', c_pi, 'LineWidth', 1.2, 'DisplayName', 'Conventional PI'); hold on;
 plot(t, i_batt_TD3, 'Color', c_td3, 'LineWidth', 1.2, 'DisplayName', 'TD3-RL Agent');
 plot(t, i_batt_LSTM, 'Color', c_lstm, 'LineWidth', 1.5, 'DisplayName', 'Trained 4-Step LSTM');
@@ -260,15 +258,14 @@ yline(i_batt_min, 'r--', 'Max Charge (-9.33 A)', 'LabelHorizontalAlignment', 'ri
 yline(0, 'k:', 'Float / Idle (0 A)');
 grid on; box on;
 xlim([0 25]); ylim([-12 12]);
-title('Bidirectional BESS Converter Current: i_{batt}(t) = u(t)', 'FontSize', 13, 'FontWeight', 'bold');
-xlabel('Time (seconds)', 'FontSize', 11);
-ylabel('Battery Inductor Current (A)', 'FontSize', 11);
-legend('Location', 'southeast', 'FontSize', 10);
+title('Figure 3: Bidirectional BESS Converter Current: i_{batt}(t) = u(t)', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Time (seconds)', 'FontSize', 10);
+ylabel('Battery Current (A)', 'FontSize', 10);
+legend('Location', 'southeast', 'FontSize', 9);
 saveas(f3, fullfile(figDir, 'Figure3_Battery_Bidirectional_Current.png'));
-close(f3);
 
 % --- Figure 4: Microgrid Current & Power Balance ---
-f4 = figure('Name', 'Microgrid Current Balance', 'Position', [100 100 1100 600], 'Visible', 'off');
+f4 = figure('Name', 'Figure 4 - Microgrid Current Balance', 'Position', [200 60 950 550], 'Visible', 'on');
 
 subplot(3, 1, 1);
 plot(t, i_pv, 'Color', [0.93 0.69 0.13], 'LineWidth', 1.8);
@@ -287,12 +284,10 @@ plot(t, i_batt_LSTM, 'Color', c_lstm, 'LineWidth', 1.5, 'DisplayName', 'Trained 
 grid on; title('BESS Response Balancing Current i_{batt}(t) [Charge < 0 | Discharge > 0]');
 ylabel('Current (A)'); xlabel('Time (seconds)'); xlim([0 25]); ylim([-11 11]);
 legend('Location', 'southeast');
-
 saveas(f4, fullfile(figDir, 'Figure4_Microgrid_Power_Current_Balance.png'));
-close(f4);
 
 % --- Figure 5: Highlighted Disturbance Events Subplots ---
-f5 = figure('Name', 'Detailed Disturbance Subplots', 'Position', [100 100 1100 650], 'Visible', 'off');
+f5 = figure('Name', 'Figure 5 - Detailed Disturbance Subplots', 'Position', [240 40 950 550], 'Visible', 'on');
 
 subplot(2, 1, 1);
 idx_z1 = (t >= 7.5 & t <= 12.0);
@@ -301,7 +296,7 @@ plot(t(idx_z1), V_sensed_PI(idx_z1), 'Color', c_pi, 'LineWidth', 1.5, 'DisplayNa
 plot(t(idx_z1), V_sensed_TD3(idx_z1), 'Color', c_td3, 'LineWidth', 1.5, 'DisplayName', 'TD3-RL');
 plot(t(idx_z1), V_sensed_LSTM(idx_z1), 'Color', c_lstm, 'LineWidth', 1.8, 'DisplayName', 'Trained LSTM');
 grid on;
-title('Zoomed-in Dynamic Response: Solar PV Cloud Cover Event (t = 8.0 s)');
+title('Solar PV Cloud Cover Event (t = 8.0 s)');
 xlabel('Time (s)'); ylabel('DC Bus Voltage (V)');
 legend('Location', 'southeast');
 
@@ -312,12 +307,49 @@ plot(t(idx_z2), V_sensed_PI(idx_z2), 'Color', c_pi, 'LineWidth', 1.5, 'DisplayNa
 plot(t(idx_z2), V_sensed_TD3(idx_z2), 'Color', c_td3, 'LineWidth', 1.5, 'DisplayName', 'TD3-RL');
 plot(t(idx_z2), V_sensed_LSTM(idx_z2), 'Color', c_lstm, 'LineWidth', 1.8, 'DisplayName', 'Trained LSTM');
 grid on;
-title('Zoomed-in Dynamic Response: Heavy Load Switching Event (t = 16.0 s)');
+title('Heavy Load Switching Event (t = 16.0 s)');
 xlabel('Time (s)'); ylabel('DC Bus Voltage (V)');
 legend('Location', 'southeast');
-
 saveas(f5, fullfile(figDir, 'Figure5_Transient_Events_Detailed.png'));
-close(f5);
+
+% --- Figure 6: Master Executive Dashboard (4-in-1 View) ---
+f6 = figure('Name', 'Figure 6 - Master Microgrid Control Dashboard', 'Position', [50 50 1200 700], 'Visible', 'on');
+
+subplot(2, 2, 1);
+plot(t, V_ref, 'k--', 'LineWidth', 1.8); hold on;
+plot(t, V_sensed_PI, 'Color', c_pi, 'LineWidth', 1.2);
+plot(t, V_sensed_TD3, 'Color', c_td3, 'LineWidth', 1.2);
+plot(t, V_sensed_LSTM, 'Color', c_lstm, 'LineWidth', 1.5);
+grid on; title('(A) DC Bus Voltage Regulation (300 V)');
+xlabel('Time (s)'); ylabel('Voltage (V)'); ylim([265 315]);
+
+subplot(2, 2, 2);
+plot(t, e_PI, 'Color', c_pi, 'LineWidth', 1.2); hold on;
+plot(t, e_TD3, 'Color', c_td3, 'LineWidth', 1.2);
+plot(t, e_LSTM, 'Color', c_lstm, 'LineWidth', 1.5);
+yline(6, 'k:'); yline(-6, 'k:'); yline(0, 'k--');
+grid on; title('(B) Tracking Error Trajectories');
+xlabel('Time (s)'); ylabel('Error e(t) (V)'); ylim([-10 35]);
+
+subplot(2, 2, 3);
+plot(t, i_batt_PI, 'Color', c_pi, 'LineWidth', 1.2); hold on;
+plot(t, i_batt_TD3, 'Color', c_td3, 'LineWidth', 1.2);
+plot(t, i_batt_LSTM, 'Color', c_lstm, 'LineWidth', 1.5);
+yline(i_batt_max, 'r--'); yline(i_batt_min, 'r--'); yline(0, 'k:');
+grid on; title('(C) Bidirectional BESS Current i_{batt}(t)');
+xlabel('Time (s)'); ylabel('Current (A)'); ylim([-12 12]);
+
+subplot(2, 2, 4);
+plot(t, i_pv, 'Color', [0.93 0.69 0.13], 'LineWidth', 1.5, 'DisplayName', 'I_{PV}'); hold on;
+plot(t, i_load, 'Color', [0.64 0.08 0.18], 'LineWidth', 1.5, 'DisplayName', 'I_{Load}');
+plot(t, i_batt_TD3, 'Color', c_td3, 'LineWidth', 1.2, 'DisplayName', 'I_{BESS} (TD3)');
+plot(t, i_batt_LSTM, 'Color', c_lstm, 'LineWidth', 1.5, 'DisplayName', 'I_{BESS} (LSTM)');
+grid on; title('(D) Net Power & Current Balance');
+xlabel('Time (s)'); ylabel('Current (A)'); legend('Location', 'northeast');
+
+sgtitle('DC Microgrid Voltage Regulation: PI vs. TD3-RL vs. 4-Step LSTM', 'FontSize', 14, 'FontWeight', 'bold');
+saveas(f6, fullfile(figDir, 'Figure6_Master_Microgrid_Dashboard.png'));
+drawnow;
 
 %% 9. Save All Microgrid Benchmark Data
 microgridData.t = t;

@@ -213,25 +213,31 @@ c_pi   = [0.85 0.33 0.10];   % Orange
 c_td3  = [0.00 0.45 0.74];   % Blue
 c_lstm = [0.47 0.67 0.19];   % Green
 
+projRoot = fileparts(fileparts(mfilename('fullpath')));
+if isempty(projRoot), projRoot = pwd; end
+figDir = fullfile(projRoot, 'docs', 'figures');
+if ~exist(figDir, 'dir'), mkdir(figDir); end
+resDir = fullfile(projRoot, 'results');
+if ~exist(resDir, 'dir'), mkdir(resDir); end
+
 % --- Figure 1: Time-Series Voltage Tracking Response ---
-f1 = figure('Name', 'Voltage Tracking Response', 'Position', [100 100 1100 550], 'Visible', 'off');
+f1 = figure('Name', 'Figure 1 - Step Voltage Tracking Response', 'Position', [100 100 1000 500], 'Visible', 'on');
 plot(t, V_ref, 'k--', 'LineWidth', 2.0, 'DisplayName', 'Reference Setpoint V_{ref}'); hold on;
 plot(t, V_sensed_PI, 'Color', c_pi, 'LineWidth', 1.5, 'DisplayName', 'Conventional Discrete PI');
 plot(t, V_sensed_TD3, 'Color', c_td3, 'LineWidth', 1.5, 'DisplayName', 'TD3-Tuned RL Agent');
 plot(t, V_sensed_LSTM, 'Color', c_lstm, 'LineWidth', 1.8, 'DisplayName', '4-Step Memory LSTM');
 grid on; box on;
 xlim([0 25]); ylim([265 320]);
-title('DC-Bus Voltage Regulation Performance: V_{dc,sensed}(t) vs. V_{dc,ref}(t)', 'FontSize', 13, 'FontWeight', 'bold');
-xlabel('Time (seconds)', 'FontSize', 11);
-ylabel('DC-Bus Voltage (V)', 'FontSize', 11);
-legend('Location', 'southeast', 'FontSize', 10);
-xline(8.0, 'k:', 'LineWidth', 1.2); text(8.2, 316, 'Setpoint Step (+10 V)', 'FontSize', 10, 'FontWeight', 'bold');
-xline(16.0, 'r:', 'LineWidth', 1.2); text(16.2, 290, 'Load Disturbance (+4.5 V droop)', 'FontSize', 10, 'FontWeight', 'bold', 'Color', 'r');
-saveas(f1, 'Figure1_Voltage_Tracking_Comparison.png');
-close(f1);
+title('DC-Bus Voltage Regulation Performance: V_{dc,sensed}(t) vs. V_{dc,ref}(t)', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Time (seconds)', 'FontSize', 10);
+ylabel('DC-Bus Voltage (V)', 'FontSize', 10);
+legend('Location', 'southeast', 'FontSize', 9);
+xline(8.0, 'k:', 'LineWidth', 1.2); text(8.2, 316, 'Setpoint Step (+10 V)', 'FontSize', 9, 'FontWeight', 'bold');
+xline(16.0, 'r:', 'LineWidth', 1.2); text(16.2, 290, 'Load Disturbance (+4.5 V droop)', 'FontSize', 9, 'FontWeight', 'bold', 'Color', 'r');
+saveas(f1, fullfile(figDir, 'Figure1_Voltage_Tracking_Comparison.png'));
 
 % --- Figure 2: Error Trajectory Comparison ---
-f2 = figure('Name', 'Tracking Error Trajectory', 'Position', [100 100 1100 550], 'Visible', 'off');
+f2 = figure('Name', 'Figure 2 - Step Tracking Error Trajectory', 'Position', [140 80 1000 500], 'Visible', 'on');
 plot(t, e_PI, 'Color', c_pi, 'LineWidth', 1.2, 'DisplayName', sprintf('PI (IAE = %.1f V*s)', metrics(1).IAE)); hold on;
 plot(t, e_TD3, 'Color', c_td3, 'LineWidth', 1.2, 'DisplayName', sprintf('TD3-RL (IAE = %.1f V*s)', metrics(2).IAE));
 plot(t, e_LSTM, 'Color', c_lstm, 'LineWidth', 1.5, 'DisplayName', sprintf('LSTM (IAE = %.1f V*s)', metrics(3).IAE));
@@ -240,15 +246,14 @@ yline(3, 'k:', '1% Tolerance (+3V)', 'LabelHorizontalAlignment', 'left');
 yline(-3, 'k:', '-1% Tolerance (-3V)', 'LabelHorizontalAlignment', 'left');
 grid on; box on;
 xlim([0 25]); ylim([-8 35]);
-title('Closed-Loop Tracking Error Trajectory: e(t) = V_{ref}(t) - V_{sensed}(t)', 'FontSize', 13, 'FontWeight', 'bold');
-xlabel('Time (seconds)', 'FontSize', 11);
-ylabel('Tracking Error e(t) (V)', 'FontSize', 11);
-legend('Location', 'northeast', 'FontSize', 10);
-saveas(f2, 'Figure2_Error_Trajectory_Comparison.png');
-close(f2);
+title('Closed-Loop Tracking Error Trajectory: e(t) = V_{ref}(t) - V_{sensed}(t)', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Time (seconds)', 'FontSize', 10);
+ylabel('Tracking Error e(t) (V)', 'FontSize', 10);
+legend('Location', 'northeast', 'FontSize', 9);
+saveas(f2, fullfile(figDir, 'Figure2_Error_Trajectory_Comparison.png'));
 
 % --- Figure 3: Control Effort Waveforms ---
-f3 = figure('Name', 'Control Effort Comparison', 'Position', [100 100 1100 550], 'Visible', 'off');
+f3 = figure('Name', 'Figure 3 - Step Control Effort Comparison', 'Position', [180 60 1000 500], 'Visible', 'on');
 plot(t, u_PI, 'Color', c_pi, 'LineWidth', 1.2, 'DisplayName', 'Conventional PI'); hold on;
 plot(t, u_TD3, 'Color', c_td3, 'LineWidth', 1.2, 'DisplayName', 'TD3-RL Agent');
 plot(t, u_LSTM, 'Color', c_lstm, 'LineWidth', 1.5, 'DisplayName', '4-Step Memory LSTM');
@@ -256,15 +261,14 @@ yline(u_max, 'r--', 'Saturation Limit (+10.05)', 'LabelHorizontalAlignment', 'ri
 yline(u_min, 'r--', 'Saturation Limit (-9.33)', 'LabelHorizontalAlignment', 'right');
 grid on; box on;
 xlim([0 25]); ylim([-12 12]);
-title('Plant Control Input Effort: u(t) (Converter Duty Command)', 'FontSize', 13, 'FontWeight', 'bold');
-xlabel('Time (seconds)', 'FontSize', 11);
-ylabel('Control Signal u(t)', 'FontSize', 11);
-legend('Location', 'southeast', 'FontSize', 10);
-saveas(f3, 'Figure3_Control_Effort_Comparison.png');
-close(f3);
+title('Plant Control Input Effort: u(t) (Converter Duty Command)', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Time (seconds)', 'FontSize', 10);
+ylabel('Control Signal u(t)', 'FontSize', 10);
+legend('Location', 'southeast', 'FontSize', 9);
+saveas(f3, fullfile(figDir, 'Figure3_Control_Effort_Comparison.png'));
 
 % --- Figure 4: Highlighted Disturbance & Setpoint Transient Subplots ---
-f4 = figure('Name', 'Detailed Transient Subplots', 'Position', [100 100 1100 650], 'Visible', 'off');
+f4 = figure('Name', 'Figure 4 - Step Detailed Transient Subplots', 'Position', [220 40 1000 550], 'Visible', 'on');
 
 subplot(2, 1, 1);
 idx_z1 = (t >= 7.5 & t <= 12.0);
@@ -287,9 +291,8 @@ grid on;
 title('Zoomed-in Dynamic Response: Sudden Load Disturbance Rejection (t = 16.0 s)');
 xlabel('Time (s)'); ylabel('Voltage (V)');
 legend('Location', 'southeast');
-
-saveas(f4, 'Figure4_Disturbance_Rejection_Comparison.png');
-close(f4);
+saveas(f4, fullfile(figDir, 'Figure4_Disturbance_Rejection_Comparison.png'));
+drawnow;
 
 %% 9. Save All Benchmark Data
 benchmarkData.t = t;

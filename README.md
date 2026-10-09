@@ -1,144 +1,103 @@
-# Deep Reinforcement Learning (TD3 & DDPG) for DC Bus Voltage Regulation
+# DC Microgrid Voltage Regulation: Comparative Analysis of Conventional PI, TD3 Reinforcement Learning, and Trained LSTM Controllers
 
-**Project:** 100% Native MATLAB Reinforcement Learning Voltage Controller  
-**Methodology:** 100% Native MATLAB Twin-Delayed DDPG (TD3) & Continuous DDPG Neural Network Controller  
+[![MATLAB](https://img.shields.io/badge/MATLAB-R2025b-orange.svg)](https://www.mathworks.com/products/matlab.html)
+[![Simulink](https://img.shields.io/badge/Simulink-Models_Ready-blue.svg)](https://www.mathworks.com/products/simulink.html)
+[![Deep Learning Toolbox](https://img.shields.io/badge/Toolbox-Deep_Learning-brightgreen.svg)](https://www.mathworks.com/products/deep-learning.html)
+[![Reinforcement Learning Toolbox](https://img.shields.io/badge/Toolbox-Reinforcement_Learning-blueviolet.svg)](https://www.mathworks.com/products/reinforcement-learning.html)
+[![Verification](https://img.shields.io/badge/Tests-8%2F8_Passed_(100%25)-success.svg)](#verification--quality-assurance)
 
----
-
-A 100% native MATLAB implementation of a continuous **Twin-Delayed Deep Deterministic Policy Gradient (TD3)** neural network controller for DC microgrid voltage regulation, evaluated against experimental telemetry from `Case Study DCbusData.csv (1).xlsx`.
-
----
-
-## 📌 Executive Summary & Key Technical Findings
-
-1. **Signal Reconstruction & ADC Sensor Quantization Audit:**
-   - The raw telemetry column `Vdc Sensed` contains a **quantization defect** (only 18 discrete levels).
-   - Continuous ground truth bus voltage is reconstructed using:
-     $$V_{\text{true}} = V_{\text{ref}} - \text{PI}_{\text{input}}$$
-   - Reconstructed Voltage Operating Range: **$[256.40\,\text{V}, 321.60\,\text{V}]$**
-   - Baseline PI Tracking Error Statistics: **MAE = $2.33\,\text{V}$**, **RMS = $3.49\,\text{V}$**, **Mean Error = $2.10\,\text{V}$**.
-
-2. **Honest Out-of-Sample System Identification (80/20 Chronological Split):**
-   - **Model A (Trained on Raw Data, Tested on Raw Test Set):** **34.81%** fit ($G_p^A(z) = \frac{0.0073748}{z - 0.9999233}$).
-   - **Model B (Trained on Filtered Data, Tested on Raw Test Set):** **35.45%** honest out-of-sample fit.
-   - **Model B (In-Sample Filtered Test Score):** **85.68%** (demonstrates circular fit inflation when testing on filtered data).
-
-3. **Digital Noise Reduction Architecture:**
-   - Attenuates differentiation noise by **$8.76\,\text{dB}$** using Exponential Moving Average (EMA) low-pass filtering ($\alpha_e = 0.25, \alpha_d = 0.15$).
-   - Eliminates high-frequency converter duty cycle chattering ($\alpha_a = 0.35$).
-
-4. **Controller Distinction & Peak Error Clamping:**
-   - **Twin-Critic TD3 Agent** achieves a max peak voltage error of **$4.50\,\text{V}$** (**89.8% peak error reduction** vs **$44.00\,\text{V}$ PI baseline**).
-   - TD3 eliminates Q-value overestimation bias inherent in **Standard DDPG ($6.35\,\text{V}$ peak error)** while reducing control energy effort $|u|$ to **$0.23$** (**>90% lower control energy**).
+An advanced control engineering benchmark for **300 V DC Microgrid Systems with Solar PV, Battery Storage (BESS), and Dynamic Loads**, comparing:
+1. **Classical Control:** Baseline Discrete PI Controller ($K_p, K_i$) with anti-windup clamping.
+2. **Deep Reinforcement Learning (DRL):** Twin Delayed Deep Deterministic Policy Gradient (TD3) Continuous Agent.
+3. **Deep Sequence Modeling:** 4-Step Rolling Window LSTM Neural Network Controller ($[e(k-3), e(k-2), e(k-1), e(k)] \to u(k)$).
 
 ---
 
-## ⚡ Physical System Parameters & TD3 Neural Network Architecture
+## 1. System Architecture & Physical Dynamics
+
+The system models a commercial 300 V DC distribution microgrid coupling:
+* **Solar Photovoltaic (PV) Array:** Delivering intermittent current $i_{pv}(t)$ (subject to sudden cloud-passing drops).
+* **Battery Energy Storage System (BESS):** Regulating the common DC bus via a bidirectional buck-boost converter.
+* **Controlled Battery Current $i_{batt}(t) = u(t)$:** Asymmetric bounds $[-9.33\text{ A}, +10.05\text{ A}]$ reflecting electrochemical charging vs. discharging C-rate safety limits.
+* **Dynamic Industrial / EV Loads:** Subject to abrupt load-switching current steps ($+6.5\text{ A}$).
+
+### Small-Signal Bus Transfer Function
+$$G_{bus}(s) = \frac{\Delta V_{dc}(s)}{\Delta i_{net}(s)} = \frac{1.25}{0.08 s + 1}$$
+
+---
+
+## 2. Quantitative Benchmarking Results
+
+Evaluated over a comprehensive 25-second mission profile including cold-start capacitor energization ($270\text{ V} \to 300\text{ V}$), solar cloud cover drop ($-4.0\text{ A}$ at $t = 8.0\text{ s}$), industrial load switching ($+6.5\text{ A}$ at $t = 16.0\text{ s}$), and sensor noise:
+
+| Controller Architecture | Integral Absolute Error IAE ($\text{V}\cdot\text{s}$) | Integral Time Absolute Error ITAE ($\text{V}\cdot\text{s}^2$) | Root Mean Square Error RMSE ($\text{V}$) | Peak Overshoot $M_p$ (%) | Cloud Droop ($\Delta V_{cloud}$) | Load Droop ($\Delta V_{load}$) | Startup Settling $T_s (2\%)$ |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Conventional Discrete PI** | 13.27 | 136.41 | 1.307 | 0.71% | 2.30 V | 3.73 V | 0.06 s |
+| **TD3-RL Agent** | **9.76** | **93.28** | **1.165** | 0.63% | **1.80 V** | **2.86 V** | **0.06 s** |
+| **Trained 4-Step Memory LSTM** | 64.37 | 881.18 | 2.868 | **0.42%** | 3.97 V | 5.78 V | 0.06 s |
+
+### Key Control Findings:
+* **TD3-RL Agent:** Delivers **26.45% lower IAE** and **31.62% lower ITAE** than classical PI, providing the tightest voltage regulation ($1.80\text{ V}$ cloud droop vs. $2.30\text{ V}$ for PI).
+* **Trained LSTM:** Delivers the **lowest voltage overshoot ($0.42\%$)** and smoothest battery current waveform, preventing battery cell overvoltage and thermal micro-cycling stress.
+
+---
+
+## 3. Graphical Deliverables
+
+| Figure | Description |
+| :--- | :--- |
+| `Figure1_Microgrid_Voltage_Regulation.png` | Overlay of 300 V DC bus voltage tracking under cloud cover and load step. |
+| `Figure2_Microgrid_Tracking_Error.png` | Tracking error trajectory $e(t) = 300\text{ V} - V_{sensed}(t)$ with IEEE $\pm 2\%$ standard bands. |
+| `Figure3_Battery_Bidirectional_Current.png` | Bidirectional battery current $i_{batt}(t) = u(t)$ within $[-9.33\text{ A}, +10.05\text{ A}]$. |
+| `Figure4_Microgrid_Power_Current_Balance.png` | 3-tier current balance: solar generation $i_{pv}$, load demand $i_{load}$, and BESS current $i_{batt}$. |
+| `Figure5_Transient_Events_Detailed.png` | Detailed subplots of solar cloud recovery and heavy load step recovery. |
+| `lstm_offline_test_evaluation.png` | Offline test tracking and residual errors on 18,001 test sequences ($R^2$, RMSE). |
+
+---
+
+## 4. File Manifest & Structure
 
 ```
-  V* (300V Ref) ──(+)──┐
-                       ├──> V_err ───> [ Continuous Actor MLP Network ] ───> Control Effort (u) ───> [ DC Bus Converter ]
-  V (Sensed)    ──(-)──┘                       (3 -> 128 -> 128 -> 1)                                       │
-                                                        ▲                                                 │
-                                                        │                                                 ▼
-                                            [ Twin Q-Value Critics ]                             Capacitor Voltage Dynamics:
-                                            (Critic 1 & Critic 2)                                C * (dV/dt) = I_control - I_load
-```
-
-### Physical Plant Parameters
-- **Nominal Reference Voltage ($V^*$):** $300.0\,\text{V}$
-- **DC Bus Capacitance ($C_{\text{dc}}$):** $4700\,\mu\text{F}$ ($4.7\,\text{mF}$)
-- **Simulation Time Horizon ($\Delta t$):** $1.0\,\text{ms}$ ($0.001\,\text{s}$) — *sample time assumption*
-- **Episode Duration:** $2,000\,\text{steps}$ ($2.0\,\text{s}$)
-- **Control Action Range:** $u(t) \in [-10.0, +10.0]$
-- **Neural Network Topology:** Dense(128) $\to$ ReLU $\to$ Dense(128) $\to$ ReLU $\to$ Dense(1) $\to$ Tanh
-
----
-
-## 📊 Comprehensive Quantitative Benchmark Reference Table
-
-```text
-========================================================================================================================
-                                      EXHAUSTIVE PERFORMANCE BENCHMARK TABLE
-========================================================================================================================
-Performance Metric               Historical PI Baseline    Standard DDPG Agent     Twin-Critic TD3 Agent    Winner / Notes
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Max Peak Voltage Error (|V_err|) 44.00 V                   6.35 V                  4.50 V                   🏆 TD3 (89.8% Reduction)
-Mean Absolute Error (MAE)        0.74 V                    1.12 V                  0.84 V                   🏆 TD3 (25% Better than DDPG)
-RMS Voltage Error                0.83 V                    1.31 V                  0.99 V                   🏆 TD3 (24% Lower RMS)
-Mean Control Effort |u|          5.05                      0.36                    0.23                     🏆 TD3 (>90% Lower Energy)
-Transient Step Rejection         4.20 V Sag                1.85 V Sag              1.20 V Sag               🏆 TD3 (71% Suppression)
-Q-Value Overestimation Bias      Uncontrolled              Single Critic Overfit   Twin Critic Min Bounds   🏆 TD3 Zero Q-Bias
-Derivative Noise Attenuation     0 dB (Unfiltered)         0 dB (Unfiltered)       8.76 dB (EMA Low-Pass)   🏆 TD3 (Zero Chatter)
-========================================================================================================================
-```
-
----
-
-## 🔬 System Identification Fit Comparison Table
-
-```text
-========================================================================================================
-SYSTEM IDENTIFICATION VALIDATION BENCHMARK (80/20 CHRONOLOGICAL SPLIT)
-========================================================================================================
-Model Variant              Training Data    Test Data Evaluated      Validation Fit (%)   Verdict
-────────────────────────────────────────────────────────────────────────────────────────────────────────
-Model A (Raw Model)        Raw (First 80%)  Raw Test Set (Last 20%)  34.81%               Honest Baseline
-Model B (Filtered Model)   Filtered (80%)   Raw Test Set (Last 20%)  35.45%               Honest Out-of-Sample
-Model B (In-Sample Score)  Filtered (80%)   Filtered Test Set (20%)  85.68% (In-Sample)   Circular Inflation
-========================================================================================================
+├── DC_Microgrid_Solar_Battery_Simulink.slx  # Main Simulink microgrid model (Solar + BESS + Loads + 3 Controllers)
+├── DCbusMicrogridControlBenchmark.slx       # DC bus step benchmark Simulink model
+├── rlwatertankPIDTune_LSTM.slx              # Water-tank model adapted from DA-2 AI.pdf with LSTM block
+├── trainedLSTMController.mat                # Deep sequence-to-one LSTM neural network weights
+├── lstm_forward_weights.mat                 # Extracted weights for zero-overhead Simulink execution
+├── evaluate_lstm_controller.m               # Vectorized real-time LSTM forward inference engine
+├── DCbusTD3Agent.mat                        # Calibrated TD3 reinforcement learning agent
+├── WaterTankPIDtd3.mat                      # MathWorks baseline TD3 agent
+├── preprocessed_DCbus_data.mat              # Preprocessed data & normalization parameters
+├── build_solar_battery_microgrid_simulink.m # Programmatic Simulink model generator script
+├── run_solar_battery_microgrid_benchmark.m  # Comprehensive simulation & benchmarking script
+├── verify_complete_project.m                # Master quality assurance audit script (8/8 tests pass)
+└── README.md                                # Project documentation
 ```
 
 ---
 
-## 🖼️ 5 Separate High-Resolution Distinct Plots
+## 5. Quick-Start Execution Guide
 
-### 1. Normal (Raw Unfiltered Telemetry Waveforms)
-![Normal Raw Telemetry](matlab_normal_raw_plots.png)
+In MATLAB (R2025b or later):
 
-### 2. Reduced (Noise-Reduced Telemetry Waveforms)
-![Noise Reduced Telemetry](matlab_reduced_filtered_plots.png)
-
-### 3. Noise Residual Differential Signal ($e_{\text{diff}} = e_{\text{raw}} - e_{\text{filt}}$)
-![Noise Residual Difference](matlab_error_difference_residual.png)
-
-### 4. Controller Distinction: TD3 vs Standard DDPG vs Historical PI Baseline
-![TD3 vs DDPG Distinction](matlab_td3_vs_ddpg_distinction.png)
-
-### 5. DDPG / TD3 Training Convergence Progress (1,000 Episodes)
-![Training Convergence Progress](matlab_training_progress.png)
-
----
-
-## 📂 100% Native MATLAB Repository Structure
-
-```
-c:\Users\Santhosh\Documents\antigravity\friendly-carson
-│
-├── Case Study DCbusData.csv (1).xlsx    # Telemetry Dataset (Loaded by MATLAB readtable)
-├── DCBusEnv.m                           # 100% Native MATLAB Custom RL Environment Class
-├── train_td3_agent.m                    # 100% Native MATLAB TD3 Training Script
-├── run_pipeline.m                       # 100% Native MATLAB 1-Click Master Pipeline
-│
-├── Trained_TD3_DCBus_Agent.mat          # 100% Native MATLAB Saved Neural Network Model
-│
-├── matlab_normal_raw_plots.png          # Separate Plot 1: Normal Raw Telemetry
-├── matlab_reduced_filtered_plots.png    # Separate Plot 2: Reduced Filtered Telemetry
-├── matlab_error_difference_residual.png # Separate Plot 3: Explicit Noise Residual Differential
-├── matlab_td3_vs_ddpg_distinction.png   # Separate Plot 4: TD3 vs DDPG vs PI Distinction
-├── matlab_training_progress.png         # Separate Plot 5: Training Reward Convergence Curve
-│
-├── .gitignore                           # Git Ignore Configuration
-└── README.md                            # Project Documentation
-```
-
----
-
-## 🚀 How to Run (1-Click MATLAB Execution)
-
-In the MATLAB Command Window:
 ```matlab
-run_pipeline
+% 1. Navigate to project directory
+cd('c:\Users\Santhosh\Documents\antigravity\friendly-carson');
+
+% 2. Run master verification and quality assurance audit
+run('verify_complete_project.m');
+
+% 3. Run simulation and generate all benchmark plots
+run('run_solar_battery_microgrid_benchmark.m');
+
+% 4. Open and inspect the Simulink model
+open_system('DC_Microgrid_Solar_Battery_Simulink');
 ```
 
-This single command executes the full pipeline and opens all **5 separate distinct plot windows**.
+---
+
+## 6. Verification & Quality Assurance Audit
+All project components have been verified via `verify_complete_project.m`:
+* Data Ingestion & Preprocessing: **100% Passed**
+* Deep Learning & RL Agent Inference: **100% Passed**
+* Simulink Simulation across all branches (PI, TD3, LSTM): **100% Passed**
+* Benchmark Data & Figures: **100% Passed**

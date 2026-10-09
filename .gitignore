@@ -7,10 +7,12 @@ slprj/
 .DS_Store
 Thumbs.db
 
-# Python temporary files
+# Execution logs & temporary files
+*.log
+*.tmp
+matlab_crash_dump.*
+matlab_execution_summary.txt
+
+# Python cache
 __pycache__/
 *.pyc
-
-# Temporary execution logs
-matlab_execution_summary.txt
-rakesh_repo/

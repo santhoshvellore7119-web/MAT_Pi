@@ -6,6 +6,12 @@
 [![Reinforcement Learning Toolbox](https://img.shields.io/badge/Toolbox-Reinforcement_Learning-blueviolet.svg)](https://www.mathworks.com/products/reinforcement-learning.html)
 [![Verification](https://img.shields.io/badge/Tests-8%2F8_Passed_(100%25)-success.svg)](#verification--quality-assurance)
 
+**Author / Student Name:** Santhosh.G  
+**Register Number:** 25BEL0016  
+**GitHub Repository:** [https://github.com/santhoshvellore7119-web/MAT_Pi](https://github.com/santhoshvellore7119-web/MAT_Pi)  
+**Final Extensive PDF Report:** [`docs/DC_Microgrid_Extensive_Technical_Report.pdf`](docs/DC_Microgrid_Extensive_Technical_Report.pdf)  
+**Final Technical Markdown Report:** [`docs/DC_Microgrid_Professional_Technical_Report.md`](docs/DC_Microgrid_Professional_Technical_Report.md)  
+
 An advanced control engineering benchmark for **300 V DC Microgrid Systems with Solar PV, Battery Storage (BESS), and Dynamic Loads**, comparing:
 1. **Classical Control:** Baseline Discrete PI Controller ($K_p, K_i$) with anti-windup clamping.
 2. **Deep Reinforcement Learning (DRL):** Twin Delayed Deep Deterministic Policy Gradient (TD3) Continuous Agent.

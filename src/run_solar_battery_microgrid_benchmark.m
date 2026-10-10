@@ -1,8 +1,6 @@
 % Comprehensive Simulation & Benchmarking: DC Microgrid with Solar PV, Battery Storage, and Dynamic Loads
 % Project: Comparative Analysis of Conventional PI, TD3 RL, and Trained LSTM Controllers
-% Author: Expert Control Systems, RL & DL Engineer
-
-clc; clear; close all;
+% Author: Santhosh.G (25BEL0016)
 
 fprintf('====================================================================\n');
 fprintf('SIMULATION & BENCHMARKING: DC MICROGRID WITH SOLAR & BATTERY STORAGE\n');

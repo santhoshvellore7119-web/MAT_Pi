@@ -68,9 +68,9 @@ Strict temporal ordering is preserved across the 119,998 windowed sequences:
 | **7** | `reg_output` | `regressionLayer` | Half-Mean-Squared-Error (MSE) Loss | — |
 
 #### Offline Training Progress & Test Set Generalization:
-![LSTM Offline Test Evaluation](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/lstm_offline_test_evaluation.png)
+![LSTM Offline Test Evaluation](figures/lstm_offline_test_evaluation.png)
 
-![MATLAB Training Progress](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/matlab_training_progress.png)
+![MATLAB Training Progress](figures/matlab_training_progress.png)
 
 * **Offline Test RMSE:** **$1.5725\text{ V}$** across the 18,001 unseen test sequences.
 * **Coefficient of Determination ($R^2$):** **$0.9632$** (96.32% of control variance captured).
@@ -82,7 +82,7 @@ Strict temporal ordering is preserved across the 119,998 windowed sequences:
 The Twin Delayed Deep Deterministic Policy Gradient (TD3) agent utilizes an Actor-Critic architecture where the deterministic actor maps observations $\mathbf{s}(k) = [\int e(t)dt, \; e(k)]^T$ to continuous control actions while two twin critic networks $Q_{\theta_1}(\mathbf{s}, a), Q_{\theta_2}(\mathbf{s}, a)$ mitigate Q-value overestimation via clipped double Q-learning:
 $$y = r + \gamma \min_{i=1,2} Q_{\theta'_i}\big(\mathbf{s}', \operatorname{clip}(\mu_{\phi'}(\mathbf{s}') + \epsilon, u_{min}, u_{max})\big)$$
 
-![TD3 vs DDPG Architectural Distinction](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/matlab_td3_vs_ddpg_distinction.png)
+![TD3 vs DDPG Architectural Distinction](figures/matlab_td3_vs_ddpg_distinction.png)
 
 ---
 
@@ -93,21 +93,21 @@ All three Simulink models have been programmatically constructed, verified, and 
 ### 4.1 Model 1: Baseline Water-Tank Benchmark with 4-Step LSTM (`rlwatertankPIDTune_LSTM.slx`)
 Built directly upon the assignment's `rlwatertankPIDTune.slx` architecture by replacing the discrete PI controller with a 3-stage tapped delay line (`Delay1`, `Delay2`, `Delay3`) and the trained LSTM inference subsystem (`LSTM_Controller_Subsystem`):
 
-![WaterTank LSTM Simulink Architecture](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/WaterTank_LSTM_Architecture.png)
+![WaterTank LSTM Simulink Architecture](figures/WaterTank_LSTM_Architecture.png)
 
 ---
 
 ### 4.2 Model 2: Core DC-Bus Step-Tracking Benchmark (`DCbusMicrogridControlBenchmark.slx`)
 Implements the closed-loop DC-bus voltage step-tracking and load-disturbance benchmark with selectable branches for Conventional PI, TD3-RL Agent, and the 4-Step Memory LSTM Controller:
 
-![DCbus Benchmark Simulink Architecture](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/DCbus_Benchmark_Architecture.png)
+![DCbus Benchmark Simulink Architecture](figures/DCbus_Benchmark_Architecture.png)
 
 ---
 
 ### 4.3 Model 3: Engineering Application — 300 V Solar PV + Battery Storage (BESS) DC Microgrid (`DC_Microgrid_Solar_Battery_Simulink.slx`)
 Models a complete 300 V DC distribution microgrid coupling an intermittent Solar PV array ($8.0\text{ A} \to 4.0\text{ A}$ cloud cover drop at $t = 8.0\text{ s}$), dynamic industrial loads ($6.0\text{ A} \to 12.5\text{ A}$ step surge at $t = 16.0\text{ s}$), a bidirectional BESS buck-boost converter with asymmetric electrochemical limits $[-9.33386\text{ A}, +10.05030\text{ A}]$, common DC bus capacitor bank $G_{bus}(s) = \frac{1.25}{0.08s + 1}$, and an auto-opening 3-channel live oscilloscope (`Scope_Microgrid`):
 
-![Solar Battery DC Microgrid Simulink Architecture](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Simulink_Model_Architecture.png)
+![Solar Battery DC Microgrid Simulink Architecture](figures/Simulink_Model_Architecture.png)
 
 ---
 
@@ -121,19 +121,19 @@ Executed via `src/step5_run_comparative_benchmark.m` over a 25.0-second horizon 
 * **$t = 16.0\text{ s}$:** Sudden load disturbance injection ($-4.5\text{ V}$ equivalent droop).
 
 #### Figure A.1: Step-Tracking Voltage Response (`Figure1_Voltage_Tracking_Comparison.png`)
-![Step Voltage Tracking Comparison](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure1_Voltage_Tracking_Comparison.png)
+![Step Voltage Tracking Comparison](figures/Figure1_Voltage_Tracking_Comparison.png)
 * **Analysis:** Both PI and TD3-RL track the $300\text{ V}$ and $310\text{ V}$ setpoints with zero steady-state offset, with TD3-RL exhibiting faster rise time and tighter disturbance rejection at $t = 16.0\text{ s}$. The 4-step LSTM controller delivers a smooth, non-oscillatory response without overshoot.
 
 #### Figure A.2: Step-Tracking Error Trajectory (`Figure2_Error_Trajectory_Comparison.png`)
-![Step Error Trajectory Comparison](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure2_Error_Trajectory_Comparison.png)
+![Step Error Trajectory Comparison](figures/Figure2_Error_Trajectory_Comparison.png)
 * **Analysis:** Highlights the tracking error $e(t) = V_{ref}(t) - V_{sensed}(t)$ against $\pm 1\%$ ($\pm 3\text{ V}$) tolerance bands. TD3-RL achieves the fastest error convergence after each transient event.
 
 #### Figure A.3: Converter Control Effort (`Figure3_Control_Effort_Comparison.png`)
-![Step Control Effort Comparison](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure3_Control_Effort_Comparison.png)
+![Step Control Effort Comparison](figures/Figure3_Control_Effort_Comparison.png)
 * **Analysis:** Demonstrates adherence to the physical saturation limits $[-9.33\text{ A}, +10.05\text{ A}]$ and reveals the superior noise-filtering smoothness of the LSTM controller compared to PI and TD3.
 
 #### Figure A.4: Zoomed-in Setpoint & Disturbance Transients (`Figure4_Disturbance_Rejection_Comparison.png`)
-![Step Disturbance Rejection Comparison](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure4_Disturbance_Rejection_Comparison.png)
+![Step Disturbance Rejection Comparison](figures/Figure4_Disturbance_Rejection_Comparison.png)
 * **Analysis:** Provides magnified views of the $t = 8.0\text{ s}$ step transition and $t = 16.0\text{ s}$ load disturbance recovery.
 
 ---
@@ -147,30 +147,30 @@ Executed via `src/run_solar_battery_microgrid_benchmark.m` and `open_and_simulat
 * **$t = 16.0\text{ s} - 25.0\text{ s}$:** Heavy industrial load switches ON ($6.0\text{ A} \to 12.5\text{ A}$); BESS dispatches $i_{batt} \approx +8.5\text{ A}$ near its $+10.05\text{ A}$ limit.
 
 #### Figure B.1: 300 V Microgrid Bus Voltage Regulation (`Figure1_Microgrid_Voltage_Regulation.png`)
-![Microgrid Voltage Regulation](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure1_Microgrid_Voltage_Regulation.png)
+![Microgrid Voltage Regulation](figures/Figure1_Microgrid_Voltage_Regulation.png)
 * **Analysis:**
   * **Startup Overshoot:** Trained LSTM achieves the **lowest peak overshoot of $0.42\%$ ($301.26\text{ V}$)**, outperforming TD3-RL ($0.63\%$, $301.89\text{ V}$) and Conventional PI ($0.71\%$, $302.13\text{ V}$).
   * **Cloud Cover Droop ($t = 8.0\text{ s}$):** TD3-RL limits voltage sag to **$1.80\text{ V}$** ($298.20\text{ V}$), beating PI ($2.30\text{ V}$) and LSTM ($3.97\text{ V}$).
   * **Heavy Load Droop ($t = 16.0\text{ s}$):** TD3-RL limits voltage sag to **$2.86\text{ V}$** ($297.14\text{ V}$), beating PI ($3.73\text{ V}$) and LSTM ($5.78\text{ V}$).
 
 #### Figure B.2: Closed-Loop Tracking Error Trajectory (`Figure2_Microgrid_Tracking_Error.png`)
-![Microgrid Tracking Error](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure2_Microgrid_Tracking_Error.png)
+![Microgrid Tracking Error](figures/Figure2_Microgrid_Tracking_Error.png)
 * **Analysis:** All three controllers maintain tracking error within the IEEE $\pm 2\%$ ($\pm 6.0\text{ V}$) microgrid voltage tolerance corridor across the entire 25-second mission. TD3-RL achieves an IAE of **$9.76\text{ V}\cdot\text{s}$** ($26.45\%$ lower than PI's $13.27\text{ V}\cdot\text{s}$).
 
 #### Figure B.3: Bidirectional BESS Converter Current (`Figure3_Battery_Bidirectional_Current.png`)
-![Battery Bidirectional Current](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure3_Battery_Bidirectional_Current.png)
+![Battery Bidirectional Current](figures/Figure3_Battery_Bidirectional_Current.png)
 * **Analysis:** Illustrates seamless 4-quadrant transition from battery charging ($-2.0\text{ A}$) to light discharging ($+2.0\text{ A}$) and heavy discharging ($+8.5\text{ A}$) within the asymmetric electrochemical protection limits $[-9.33\text{ A}, +10.05\text{ A}]$. The 4-step LSTM controller reduces current slew-rate chatter ($di/dt < 8\text{ A/s}$ vs. $45\text{ A/s}$ for PI), preventing lithium-ion thermal micro-cycling.
 
 #### Figure B.4: Three-Tier Microgrid Current & Power Balance (`Figure4_Microgrid_Power_Current_Balance.png`)
-![Microgrid Power Current Balance](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure4_Microgrid_Power_Current_Balance.png)
+![Microgrid Power Current Balance](figures/Figure4_Microgrid_Power_Current_Balance.png)
 * **Analysis:** Verifies Kirchhoff's Current Law at the common DC bus ($i_{net} = i_{pv} + i_{batt} - i_{load} \to 0$), demonstrating how the BESS absorbs renewable surplus and supplies load deficits instantaneously.
 
 #### Figure B.5: Zoomed-in Transient Events (`Figure5_Transient_Events_Detailed.png`)
-![Microgrid Transient Events Detailed](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure5_Transient_Events_Detailed.png)
+![Microgrid Transient Events Detailed](figures/Figure5_Transient_Events_Detailed.png)
 * **Analysis:** Magnified views of the cloud cover drop at $t = 8.0\text{ s}$ (TD3 recovers in $0.48\text{ s}$ vs. $0.82\text{ s}$ for PI) and the heavy load step at $t = 16.0\text{ s}$ (TD3 recovers in $0.55\text{ s}$ vs. $0.94\text{ s}$ for PI).
 
 #### Figure B.6: Master 4-in-1 Executive Dashboard (`Figure6_Master_Microgrid_Dashboard.png`)
-![Master Microgrid Dashboard](/C:/Users/Santhosh/.gemini/antigravity/brain/fe26b7b5-e6f6-4ae8-ae5d-bd2c2244f5ee/Figure6_Master_Microgrid_Dashboard.png)
+![Master Microgrid Dashboard](figures/Figure6_Master_Microgrid_Dashboard.png)
 * **Analysis:** Unified 4-quadrant executive view combining (A) Bus Voltage Regulation, (B) Tracking Error Trajectories, (C) Bidirectional BESS Current, and (D) Net Power & Current Balance.
 
 ---

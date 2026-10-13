@@ -116,31 +116,31 @@ Simulations were conducted across a 25-second mission profile featuring:
 ## 5. Graphical Deliverables
 
 ### Figure 1: DC Microgrid Common Bus Voltage Regulation
-![Voltage Regulation](Figure1_Microgrid_Voltage_Regulation.png)
+![Voltage Regulation](figures/Figure1_Microgrid_Voltage_Regulation.png)
 *Common coupling DC bus voltage response under black-start charging (t=0s), solar cloud-cover drop (t=8s), and heavy industrial load step (t=16s).*
 
 ---
 
 ### Figure 2: Closed-Loop Tracking Error Trajectory
-![Tracking Error](Figure2_Microgrid_Tracking_Error.png)
+![Tracking Error](figures/Figure2_Microgrid_Tracking_Error.png)
 *Tracking error $e(t) = 300\text{ V} - V_{sensed}(t)$ for all three controllers plotted against IEEE $\pm 2\%$ ($\pm 6\text{ V}$) standard tolerance boundaries.*
 
 ---
 
 ### Figure 3: Battery Storage Bidirectional Current Commands
-![Battery Current](Figure3_Battery_Bidirectional_Current.png)
+![Battery Current](figures/Figure3_Battery_Bidirectional_Current.png)
 *Controlled battery converter current $i_{batt}(t) = u(t)$ showing dynamic transitions between charging ($u < 0$) and discharging ($u > 0$) within $[-9.33\text{ A}, +10.05\text{ A}]$.*
 
 ---
 
 ### Figure 4: Microgrid Current & Power Balance
-![Current Balance](Figure4_Microgrid_Power_Current_Balance.png)
+![Current Balance](figures/Figure4_Microgrid_Power_Current_Balance.png)
 *Three-tier current balance illustrating solar generation $i_{pv}(t)$, load demand $i_{load}(t)$, and compensatory battery current $i_{batt}(t)$.*
 
 ---
 
 ### Figure 5: Highlighted Disturbance Events Subplots
-![Transient Subplots](Figure5_Transient_Events_Detailed.png)
+![Transient Subplots](figures/Figure5_Transient_Events_Detailed.png)
 *Zoomed-in subplots comparing transient suppression during the solar cloud event (top) and heavy load switching event (bottom).*
 
 ---

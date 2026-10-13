@@ -1,0 +1,7 @@
+# Enforce 100% MATLAB language detection on GitHub Linguist
+*.m linguist-language=MATLAB
+*.slx linguist-vendored
+*.mat linguist-vendored
+*.xlsx linguist-vendored
+*.pdf linguist-documentation
+*.md linguist-documentation

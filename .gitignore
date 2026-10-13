@@ -12,7 +12,3 @@ Thumbs.db
 *.tmp
 matlab_crash_dump.*
 matlab_execution_summary.txt
-
-# Python cache
-__pycache__/
-*.pyc

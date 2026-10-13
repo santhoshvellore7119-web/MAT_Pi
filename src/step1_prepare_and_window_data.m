@@ -9,7 +9,11 @@ fprintf('STEP 1: DATA PREPARATION & SEQUENCE WINDOWING (DC-BUS MICROGRID)\n');
 fprintf('====================================================================\n\n');
 
 %% 1. File Specification & Ingestion
-dataFile = 'C:\Users\Santhosh\Downloads\Case Study DCbusData.csv.xlsx';
+projRoot = fileparts(fileparts(mfilename('fullpath')));
+dataFile = fullfile(projRoot, 'data', 'Case Study DCbusData.csv (1).xlsx');
+if ~isfile(dataFile)
+    dataFile = 'C:\Users\Santhosh\Downloads\Case Study DCbusData.csv.xlsx';
+end
 sheetName = 'DCbusData';
 
 if ~isfile(dataFile)

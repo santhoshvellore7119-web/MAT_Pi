@@ -124,31 +124,31 @@ Simulations were executed across a challenging 25-second mission profile featuri
 ## 5. Graphical Deliverables
 
 ### Figure 1: DC-Bus Voltage Regulation Performance
-![Voltage Tracking](Figure1_Voltage_Tracking_Comparison.png)
+![Voltage Tracking](figures/Figure1_Voltage_Tracking_Comparison.png)
 *Closed-loop tracking overlay showing initial startup from 270 V, nominal regulation at 300 V, setpoint step transition to 310 V at t=8s, and disturbance rejection at t=16s.*
 
 ---
 
 ### Figure 2: Closed-Loop Tracking Error Trajectory
-![Error Trajectory](Figure2_Error_Trajectory_Comparison.png)
+![Error Trajectory](figures/Figure2_Error_Trajectory_Comparison.png)
 *Tracking error $e(t) = V_{ref}(t) - V_{sensed}(t)$ for all three controllers plotted against the $\pm 1\%$ ($3\text{ V}$) tolerance boundaries.*
 
 ---
 
 ### Figure 3: Plant Control Input Effort
-![Control Effort](Figure3_Control_Effort_Comparison.png)
+![Control Effort](figures/Figure3_Control_Effort_Comparison.png)
 *Control signal $u(t)$ waveforms bounded by physical converter duty cycle saturation limits $[-9.33, +10.05]$.*
 
 ---
 
 ### Figure 4: Highlighted Disturbance & Setpoint Transient Subplots
-![Transient Subplots](Figure4_Disturbance_Rejection_Comparison.png)
+![Transient Subplots](figures/Figure4_Disturbance_Rejection_Comparison.png)
 *Zoomed-in transient subplots for setpoint step transition (top) and load disturbance rejection (bottom).*
 
 ---
 
 ### Figure 5: LSTM Offline Validation
-![LSTM Test Evaluation](lstm_offline_test_evaluation.png)
+![LSTM Test Evaluation](figures/lstm_offline_test_evaluation.png)
 *Offline validation of the 4-step rolling window LSTM network on 18,001 test sequences.*
 
 ---

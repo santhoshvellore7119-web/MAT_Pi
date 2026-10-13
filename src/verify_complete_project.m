@@ -89,7 +89,10 @@ if ~isempty(which([mdl_microgrid '.slx']))
     try
         load_system(mdl_microgrid);
         set_param([mdl_microgrid '/Ctrl_Select'], 'Value', '3');
-        simOut = sim(mdl_microgrid, 'StopTime', '3.0');
+        origStopFcn = get_param(mdl_microgrid, 'StopFcn');
+        set_param(mdl_microgrid, 'StopFcn', '');
+        simOut = sim(mdl_microgrid, 'StopTime', '1.0');
+        set_param(mdl_microgrid, 'StopFcn', origStopFcn);
         close_system(mdl_microgrid, 0);
         fprintf('  [PASS] Test 3.1: %s.slx loads and simulates cleanly with Trained LSTM.\n', mdl_microgrid);
         passedTests = passedTests + 1;

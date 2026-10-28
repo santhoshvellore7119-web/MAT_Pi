@@ -3,5 +3,7 @@
 *.slx linguist-vendored
 *.mat linguist-vendored
 *.xlsx linguist-vendored
+*.zip linguist-vendored
 *.pdf linguist-documentation
 *.md linguist-documentation
+*.txt linguist-documentation

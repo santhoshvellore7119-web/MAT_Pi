@@ -88,6 +88,27 @@ $$y = r + \gamma \min_{i=1,2} Q_{\theta'_i}\big(\mathbf{s}', \operatorname{clip}
 
 ## 4. Simulink Models Built & Architectural Pictures (`Step 3`)
 
+### 4.0 Control Architectural Principle: From Classroom Water Tank Benchmark to Industrial DC Microgrid
+In academic coursework, the **Water Tank Level Control Benchmark** (`rlwatertankPIDTune.slx`) serves as the foundational teaching example illustrating how a classical discrete-time PID controller can be replaced by an artificial intelligence policy.
+
+Because our assigned dataset—`Case Study DCbusData.csv.xlsx`—records electrical telemetry from a regulated 300 V converter, this work elevates the classroom benchmark to a high-voltage, mission-critical energy system while preserving the exact same block replacement methodology. The governing physical dynamics share an exact mathematical isomorphism:
+
+| Dynamic Domain | Classroom Water Tank Example | Our Industrial DC Microgrid Application |
+| :--- | :--- | :--- |
+| **Plant Capacity** | Tank Cross-Sectional Area $A \cdot \frac{dh(t)}{dt}$ | DC-Bus Capacitor Bank $C_{dc} \cdot \frac{dV_{dc}(t)}{dt}$ |
+| **Controlled State ($y$)** | Water Height $h(t)$ in meters | **DC Bus Voltage $V_{dc}(t)$ in Volts** (Setpoint: **$300\text{ V}$**) |
+| **Actuator Effort ($u$)** | Inflow Valve Command (Dimensionless) | **Battery Converter Current $i_{batt}(t)$ in Amperes** |
+| **Saturation Bounds** | Physical valve stroke $[0.0, 1.0]$ | Asymmetric Converter Bounds $[-9.33386\text{ A}, +10.05030\text{ A}]$ |
+| **External Disturbances** | Unscheduled pipe leak / outflow drain | **Solar Cloud Cover ($-4.0\text{ A}$) & Heavy Load Surge ($+6.5\text{ A}$)** |
+
+#### The Closed-Loop Controller Replacement Mechanism:
+To deploy the trained 4-step LSTM controller inside Simulink without introducing external Python dependencies or simulation stalls:
+1. The discrete tracking error $e(k) = V_{ref}(k) - V_{sensed}(k)$ is routed through a cascade of three unit tapped delay blocks (`Delay1: z⁻¹`, `Delay2: z⁻¹`, `Delay3: z⁻¹`).
+2. A vector multiplexer concatenates the historical and current errors into the 4-step rolling window:
+   $$\mathbf{X}(k) = \begin{bmatrix} e(k-3) & e(k-2) & e(k-1) & e(k) \end{bmatrix}^T \in \mathbb{R}^{4 \times 1}$$
+3. An interpreted MATLAB Function block calls `evaluate_lstm_controller(X)` to execute the forward matrix recurrence $W, R, b$, yielding $u(k)$.
+4. The output is bounded by a saturation block $[-9.33386, +10.05030]$ and fed back to the plant converter.
+
 All three Simulink models have been programmatically constructed, verified, and exported at 300 DPI:
 
 ### 4.1 Model 1: Baseline Water-Tank Benchmark with 4-Step LSTM (`rlwatertankPIDTune_LSTM.slx`)
